@@ -8,11 +8,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::apiResource('post', PostController::class);
-Route::apiResource('posts.comments', CommentController::class);
 
 
-Route::get('posts/popular', [PostController::class, 'popular'])->name('posts.popular');
 
 
 // Route::get('posts/{post}/comments/most-liked', [CommentController::class, 'mostLiked'])->name('posts.comments.mostLiked');

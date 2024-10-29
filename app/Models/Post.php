@@ -19,6 +19,11 @@ class Post extends Model
     public function comments(){
         return $this->hasMany(Comment::class);
     }
+    public function likes()
+    {
+        return $this->hasMany(related: Like::class);
+    }
+
     public function comments_count(){
         return $this->hasMany(Comment::class)->count();
     }

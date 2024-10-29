@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
+use App\SharedFunctions\ResponseBuilder;
 use Illuminate\Http\Request;
-use ResponseBuilder;
 
 class PostController extends Controller
 {
@@ -15,7 +15,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $post = Post::orderBy("created_at", "desc")->get();
+        $post = Post::orderBy("created_at", "desc")->with("Comments")->get();
         return ResponseBuilder::buildResponse($post, "Posts retrieved successfully", 200);
     }
 
@@ -35,7 +35,10 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         try {
-            $post = Post::create($request->validated());
+            $post = Post::create([
+                "content" => $request->content,
+                "user_id" => $request->user_id,
+            ]);
             return ResponseBuilder::buildResponse($post, "You have created a Post!", 201);
         } catch (\Exception $e) {
             return ResponseBuilder::buildResponse(null, "Failed to create post." . $e->getMessage(), 500);
@@ -73,7 +76,13 @@ class PostController extends Controller
             if(!$post){
                 return ResponseBuilder::buildResponse(null, "Post not found!",404);
             }
-            $post->update($request->validated());
+            if($post->user_id != $request->user_id){
+                return ResponseBuilder::buildResponse(null, "You are not authorized to change this resource!",300);
+            }
+            $post->update([
+                "user_id" => $request->user_id,
+                "content" => $request->content,
+            ]);
             return ResponseBuilder::buildResponse( $post, 'Post updated successfully', 200);
         }
         catch(\Exception $e){
@@ -98,4 +107,29 @@ class PostController extends Controller
             return ResponseBuilder::buildResponse(null, "Failed to Uodate". $e->getMessage(),500);
         }
     }
+    public function likePost(Request $request)
+    {
+        $validated = $request->validate([
+            "user_id" => "required|exists:user,id",
+            "post_id" => "required"
+        ]);
+        if(!$validated){
+            return ResponseBuilder::buildResponse(null, "Incorrect Data!",404);
+        }
+
+        $post = Post::findOrFail($request->post_id);
+
+        // Check if the user has already liked the post
+        $like = $post->likes()->where('user_id', $request->user_id)->first();
+
+        if ($like) {
+            // User already liked the post, so we remove the like (unlike)
+            $like->delete();
+            return response()->json(['message' => 'Post unliked.']);
+        } else {
+            $post->likes()->create(['user_id' => $request->user_id]);
+            return response()->json(['message' => 'Post liked.']);
+        }
+    }
+
 }
