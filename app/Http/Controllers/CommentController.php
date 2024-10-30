@@ -9,26 +9,17 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $commentsdata = Comment::orderBy("created_at", "desc")->get();
         return ResponseBuilder::buildResponse($commentsdata, "Comments retrieved successfully", 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request, $post_Id)
     {
         try {
@@ -51,19 +42,6 @@ class CommentController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $post, string $comment)
     {
         try {
@@ -85,9 +63,6 @@ class CommentController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request)
     {
         try {
@@ -110,7 +85,6 @@ class CommentController extends Controller
         }
     }
 
-    // Custom method for most liked comments on a post
     public function mostLiked($postId)
     {
         // Logic for retrieving the most liked comments for a post
@@ -118,7 +92,6 @@ class CommentController extends Controller
         return ResponseBuilder::buildResponse($comments, "Most liked comments retrieved successfully", 200);
     }
 
-    // Custom method for recent comments on a post
     public function recent($postId)
     {
         // Logic for retrieving recent comments for a post
