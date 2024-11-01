@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,12 +24,15 @@ Route::middleware('auth:api')->group(function () {
     // User Management
     Route::put('user/update', [AuthController::class, 'updateUserInformation']);
     Route::delete('user/delete', [AuthController::class, 'deleteUserAccountByUser']);
-
+    Route::delete('user/disable', [AuthController::class, 'disableUserAccountByUser']);
 
     //Admin users Management
+    Route::get('admin/active-users', [UserController::class, 'getAllActiveUsers']);
+    Route::get('admin/disabled-users', [UserController::class, 'getAllDisabledUsers']);
+
     Route::post('admin/create-user', [AuthController::class, 'createUserByAdmin']);
     Route::put('admin/update-user', [AuthController::class, 'updateUserInformationByAdmin']);
-  
+    Route::put('admin/disable-user', [AuthController::class, 'disableUserByAdmin']);
    
 
     Route::apiResource('post', PostController::class);
