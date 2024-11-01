@@ -20,9 +20,16 @@ Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
 
-    //Users Management
-    Route::post('admin/create-user', [AuthController::class, 'createUserByAdmin']);
+    // User Management
+    Route::put('user/update', [AuthController::class, 'updateUserInformation']);
+    Route::delete('user/delete', [AuthController::class, 'deleteUserAccountByUser']);
 
+
+    //Admin users Management
+    Route::post('admin/create-user', [AuthController::class, 'createUserByAdmin']);
+    Route::put('admin/update-user', [AuthController::class, 'updateUserInformationByAdmin']);
+  
+   
 
     Route::apiResource('post', PostController::class);
     Route::apiResource('posts.comments', CommentController::class);

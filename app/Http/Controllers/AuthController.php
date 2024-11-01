@@ -248,7 +248,7 @@ class AuthController extends Controller
         }
     }
 
-    public function delete(Request $request){
+    public function deleteUserAccountByUser(Request $request){
         $request->validate([
             'id' => 'required|exists:users,id',
             'password' => 'required|string',
