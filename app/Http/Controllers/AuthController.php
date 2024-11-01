@@ -247,7 +247,25 @@ class AuthController extends Controller
             return ResponseBuilder::buildResponse(null, 'Failed to update user', 500);
         }
     }
+    public function disableUserAccountByAdmin(Request $request){
+        $request->validate(rules: [
+            'id' => 'required|exists:users,id',
+        ]);
 
+        $user = User::find($request->id);
+
+        if (!$user) {
+            return ResponseBuilder::buildResponse(null, 'User not found', 404);
+        }
+        // Soft delete the user
+        $user->deleted_at = now();
+
+        if ($user->save()) {
+            return ResponseBuilder::buildResponse($user, 'User disabled successfully', 200);
+        } else {
+            return ResponseBuilder::buildResponse(null, 'Failed to disable user', 500);
+        }
+    }
     public function deleteUserAccountByUser(Request $request){
         $request->validate([
             'id' => 'required|exists:users,id',
@@ -272,6 +290,36 @@ class AuthController extends Controller
         }
 
         if ($user->delete()) {
+            return ResponseBuilder::buildResponse(null, 'User deleted successfully', 200);
+        } else {
+            return ResponseBuilder::buildResponse(null, 'Failed to delete user', 500);
+        }
+    }
+    public function disableUserAccountByUser(Request $request){
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::find($request->id);
+
+        if (!$user) {
+            return ResponseBuilder::buildResponse(null, 'User not found', 404);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return ResponseBuilder::buildResponse(null, 'Password is incorrect', 401);
+        }
+
+        if ($user->profile_image) {
+            $oldImagePath = storage_path('app/public/' . $user->profile_image);
+            if (file_exists($oldImagePath)) {
+                unlink($oldImagePath);
+            }
+        }
+        $user->deleted_at = now();
+        
+        if ($user->save()) {
             return ResponseBuilder::buildResponse(null, 'User deleted successfully', 200);
         } else {
             return ResponseBuilder::buildResponse(null, 'Failed to delete user', 500);

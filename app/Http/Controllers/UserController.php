@@ -26,7 +26,6 @@ class UserController extends Controller
         }
        return ResponseBuilder::buildResponse($user, 'User retrieved successfully', 200);
     }
-
     public function store(Request $request){
         $validation = Validator::make($request->all(),[
             'name' => 'required|string',
@@ -65,7 +64,6 @@ class UserController extends Controller
             return ResponseBuilder::buildResponse(null, 'Failed to create user, ' . $e->getMessage(), 500);
         }
     }
-
     public function update(Request $request, $id)
     {
         $validation = Validator::make($request->all(), [
@@ -110,5 +108,15 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return ResponseBuilder::buildResponse(null, 'Failed to update user, ' . $e->getMessage(), 500);
         }
+    }
+    public function getAllActiveUser(){
+        //Get active users that are not disabled
+        $users = User::whereNull('deleted_at')->get();
+        return ResponseBuilder::buildResponse($users, 'Active users retrieved successfully', 200);
+    }
+    public function getAllDisabledUsers(){
+        //Get active users that are not disabled
+        $users = User::whereNotNull('deleted_at')->get();
+        return ResponseBuilder::buildResponse($users, 'Disabled users retrieved successfully', 200);
     }
 }
