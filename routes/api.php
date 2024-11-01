@@ -43,4 +43,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::put('posts/{post}/comments', [CommentController::class, 'update'])->name('posts.comments.update');
 
+    Route::post('comment/like', [CommentController::class, 'likeComment']);
+
 });

@@ -12,8 +12,11 @@ class PostController extends Controller
 {
     public function index()
     {
-        $post = Post::orderBy("created_at", "desc")->with("Comments")->get();
-        return ResponseBuilder::buildResponse($post, "Posts retrieved successfully", 200);
+        $posts = Post::withCount('likes')
+        ->with('comments')
+        ->orderBy('created_at', 'desc')
+        ->get();
+        return ResponseBuilder::buildResponse($posts, "Posts retrieved successfully", 200);
     }
 
     public function store(StorePostRequest $request)
@@ -98,5 +101,4 @@ class PostController extends Controller
             return response()->json(['message' => 'Post liked.']);
         }
     }
-
 }
