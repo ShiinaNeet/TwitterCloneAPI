@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('bio')->nullable();
             $table->string('profile_image')->nullable();
+            $table->tinyInteger('role') ->comment('0 = admin, 1 = user, 2 = moderator');;
             $table->rememberToken();
             $table->timestamps();
         });

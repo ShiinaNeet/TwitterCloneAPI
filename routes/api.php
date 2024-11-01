@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 // No middleware. This route is public...
 Route::post('login', [AuthController::class, 'login']);
-Route::post('register', [AuthController::class, 'register']);
+Route::post('register', [AuthController::class, 'registerPublicUser']);
 
 
 Route::get('/user', function (Request $request) {
@@ -20,6 +20,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
 
+    //Users Management
+    Route::post('admin/create-user', [AuthController::class, 'createUserByAdmin']);
 
 
     Route::apiResource('post', PostController::class);

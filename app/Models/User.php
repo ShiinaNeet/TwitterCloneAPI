@@ -36,6 +36,9 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token',
     ];
+    public const ROLE_ADMIN = 0;
+    public const ROLE_USER = 1;
+    public const ROLE_MODERATOR = 2;
 
     /**
      * Get the posts for the user.
