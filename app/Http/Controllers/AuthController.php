@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\SharedFunctions\ResponseBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -175,5 +177,74 @@ class AuthController extends Controller
                 'type' => 'bearer',
             ]
         ]);
+    }
+    public function updateUserInformation(Request $request){
+
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $request->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $request->id,
+            'password' => 'required|string',
+            'bio' => 'string',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $user = User::find($request->id);
+
+        if (!$user) {
+            return ResponseBuilder::buildResponse(null, 'User not found', 404);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return ResponseBuilder::buildResponse(null, 'Password is incorrect', 401);
+        }
+
+        $user->name = $request->name;
+        $user->username = $request->username;
+        $user->email = $request->email;
+        $user->bio = $request->bio;
+
+        if ($request->hasFile('profile_image')) {
+            if ($user->profile_image) {
+                $oldImagePath = storage_path('app/public/' . $user->profile_image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            $image = $request->file('profile_image');
+            $imageName = time().'.'.$image->getClientOriginalExtension();
+            $imagePath = Storage::putFileAs('public/images', $image, $imageName);
+            $user->profile_image = 'images/' . $imageName;
+        }
+        
+        if ($user->save()) {
+            return ResponseBuilder::buildResponse($user, 'User updated successfully', 200);
+        } else {
+            return ResponseBuilder::buildResponse(null, 'Failed to update user', 500);
+        }
+    }
+    public function updateUserInformationByAdmin(Request $request){
+
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'role' => 'required'
+        ]);
+
+        $user = User::find($request->id);
+
+        if (!$user) {
+            return ResponseBuilder::buildResponse(null, 'User not found', 404);
+        }
+
+
+        $user->role = $request->role;
+
+        if ($user->save()) {
+            return ResponseBuilder::buildResponse($user, 'User updated successfully', 200);
+        } else {
+            return ResponseBuilder::buildResponse(null, 'Failed to update user', 500);
+        }
     }
 }
