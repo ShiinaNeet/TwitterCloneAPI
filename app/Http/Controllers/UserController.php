@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\User;
 use App\SharedFunctions\ResponseBuilder;
 use Illuminate\Http\Request;
@@ -119,4 +120,30 @@ class UserController extends Controller
         $users = User::whereNotNull('deleted_at')->get();
         return ResponseBuilder::buildResponse($users, 'Disabled users retrieved successfully', 200);
     }
+    public function searchActiveUser(Request $request){
+         $request->validate([
+            'search' => 'required|string',
+        ]);
+
+        $searchTerm = $request->search;
+
+        $users = User::query()
+            ->where('name', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('username', 'LIKE', "%{$searchTerm}%")
+            ->whereNull('deleted_at')
+            ->get();
+
+        $posts = Post::query()
+            ->where('title', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('content', 'LIKE', "%{$searchTerm}%")
+            ->whereNull('deleted_at')
+            ->get();
+
+        $results = [
+            'users' => $users,
+            'posts' => $posts,
+        ];
+        return ResponseBuilder::buildResponse($results, 'Active users retrieved successfully', 200);
+    }
+
 }
