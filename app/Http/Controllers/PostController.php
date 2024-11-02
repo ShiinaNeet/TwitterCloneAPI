@@ -101,9 +101,9 @@ class PostController extends Controller
             return response()->json(['message' => 'Post liked.']);
         }
     }
-    public function disable(string $post_id){
+    public function disable(string $id){
         try {
-            $post = Post::find($post_id);
+            $post = Post::find($id);
             if(!$post){
                 return ResponseBuilder::buildResponse(null, "Post not found!",404);
             }

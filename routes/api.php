@@ -38,15 +38,11 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('post', PostController::class);
     Route::apiResource('posts.comments', CommentController::class);
 
-
-    Route::get('posts/popular', [PostController::class, 'popular'])->name('posts.popular');
-
-
+    Route::post('post/{id}/disable', [PostController::class, 'disable']);
     Route::post('posts/{post}/comments', [CommentController::class, 'store'])->name('posts.comments.store');
-
-
     Route::put('posts/{post}/comments', [CommentController::class, 'update'])->name('posts.comments.update');
 
+    Route::get('posts/popular', [PostController::class, 'popular'])->name('posts.popular');
     Route::post('comment/like', [CommentController::class, 'likeComment']);
 
 });
